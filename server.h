@@ -1,0 +1,26 @@
+#ifndef SERVER_H
+#define SERVER_H
+
+#include <QObject>
+#include <tufao-1/Tufao/httpserver.h>
+#include <tufao-1/Tufao/httpserverrequest.h>
+#include <tufao-1/Tufao/httpserverresponse.h>
+using namespace  Tufao;
+class Server : public QObject
+{
+    Q_OBJECT
+public:
+    explicit Server(QObject *parent = 0);
+    ~Server();
+    void HandleReq(QByteArray& req,HttpServerResponse& response);
+    void HandleRes(HttpServerResponse& response);
+private:
+    HttpServer * server;
+
+signals:
+
+public slots:
+    void slotReadyReqRes(HttpServerRequest& request,HttpServerResponse& response);
+};
+
+#endif // SERVER_H
