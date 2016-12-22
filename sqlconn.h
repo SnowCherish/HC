@@ -8,8 +8,9 @@ class SqlConn : public QObject
     Q_OBJECT
 public:
     explicit SqlConn(QObject *parent = 0);
-    int insert(QString sql);
+    int insert(QString str);
     ~SqlConn();
+    QString getErrInfo(int err);
 private:
     MYSQL* sql;
 

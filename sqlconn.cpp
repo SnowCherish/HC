@@ -16,6 +16,12 @@ SqlConn::SqlConn(QObject *parent) : QObject(parent)
     }
 }
 
+int SqlConn::insert(QString str)
+{
+    int status = mysql_query(sql,str.toUtf8().data());
+    return status;
+}
+
 SqlConn::~SqlConn()
 {
     if(sql!=NULL)
@@ -23,4 +29,9 @@ SqlConn::~SqlConn()
         mysql_close(sql);
         sql = NULL;
     }
+}
+
+QString SqlConn::getErrInfo(int err)
+{
+    return QString(mysql_errno_to_sqlstate(err));
 }
