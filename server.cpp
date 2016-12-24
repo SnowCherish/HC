@@ -46,6 +46,7 @@ Server::~Server()
     if(type.compare(HC_DRIVER)==0) //driver
     {
 
+
     }else if(type.compare(HC_PASSENGER)==0) //passenger
     {
 

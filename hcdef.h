@@ -15,4 +15,5 @@ typedef MYSQL_ROW ROW;
 #define HC_USER "root"
 #define HC_PASSWD "123456"
 #define HC_DB "hc"
+#define HC_REDIS_PORT 6379
 #endif // HCDEF_H

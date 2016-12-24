@@ -47,7 +47,7 @@ SqlConn::~SqlConn()
     }
 }
 
-int SqlConn::selData(QString str,MYSQL_ROW* r)
+int SqlConn::selData(QString str,MYSQL_ROW& r)
 {
     int status = mysql_query(sql,str.toUtf8().data());
     if(status!=0)
@@ -69,7 +69,7 @@ int SqlConn::selData(QString str,MYSQL_ROW* r)
     {
         for(i = 0;i<count;++i)
         {
-            *r[i] = row[i];
+            r[i] = row[i];
         }
     }
     mysql_free_result(result);
