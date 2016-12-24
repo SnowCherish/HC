@@ -27,7 +27,7 @@ Server::~Server()
     }
 }
 //handle login
- int Server::handle_Login(QByteArray& req)
+int Server::handle_Login(QByteArray& req)
 {
     Json j(req);
     QString type = j.parse(HC_TYPE).toString();
@@ -39,11 +39,11 @@ Server::~Server()
 
     }
 }
- int Server::handle_Reg(QByteArray& req)
+int Server::handle_Reg(QByteArray& req)
 {
     Json j(req);
     QString type = j.parse(HC_TYPE).toString();
-    QString id = "123123123";
+    QString id = Util::getInstance()->generId();
     if(type.compare(HC_DRIVER)==0) //driver
     {
 
@@ -51,19 +51,18 @@ Server::~Server()
     }else if(type.compare(HC_PASSENGER)==0) //passenger
     {
         QString sql;
-        //sql = QString("insert into passenger values('%1','%2','%3','%4','%5','%6','%7')").arg(id).arg(username)
-          //      .arg(password).arg(age).arg(sex).arg(tel).arg(cardId);
+        sql = QString("insert into passenger values('%1','%2','%3','%4','%5','%6','%7')").arg(id).arg(username)
+                .arg(password).arg(age).arg(sex).arg(tel).arg(cardId);
         int ret = SqlConn::getInstance()->insert(sql);
         if(ret!=0)
         {
-            qDebug() << "insert failed!";
-            exit(1);
-        }else{
-            qDebug() << "insert ok!";
+            qDebug() << "passenger reg failed!";
+            return -1;
+
         }
-
-
+        qDebug() << "passenger reg ok!";
     }
+    return 0;
 }
 void Server::HandleReq(QByteArray req,HttpServerResponse& response)
 {
@@ -75,7 +74,7 @@ void Server::HandleReq(QByteArray req,HttpServerResponse& response)
         ret = handle_Reg(req);
     }else if(cmd==HC_LOGIN)
     {
-       ret = handle_Login(req);
+        ret = handle_Login(req);
     }
 
 }
