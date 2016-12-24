@@ -1,6 +1,7 @@
 #include "redis.h"
 #include "hcdef.h"
 #include <QDebug>
+#include <string.h>
 
 Redis::Redis(QObject *parent) : QObject(parent)
 {
@@ -50,14 +51,17 @@ int Redis::set(QString &str, QByteArray &array)
     return 0;
 }
 
-int Redis::get(QByteArray& str)
+int Redis::get(QString& str,QByteArray& array)
 {
+
     if(str==NULL)
     {
         qDebug() << "str is NULL";
         return -1;
     }
-    r = (redisReply*)redisCommand(c,str.data());
+    char buf[1024] = {0};
+    sprintf(buf,"get %s ",str.toUtf8().data());
+    r = (redisReply*)redisCommand(c,buf);
     if(r->type!=REDIS_REPLY_STRING)
     {
         qDebug() << "failed to execute command";
@@ -65,6 +69,8 @@ int Redis::get(QByteArray& str)
         redisFree(c);
         return -1;
     }
+    array = QString(r->str).toUtf8();
+    freeReplyObject(r);
     return 0;
 }
 

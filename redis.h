@@ -14,7 +14,7 @@ class Redis : public QObject
     Q_OBJECT
 public:
     static Redis* getInstance();
-    int get(QByteArray& array);
+    int get(QString& str,QByteArray& array);
     int set(QString& str,QByteArray& array);
 private:
     explicit Redis(QObject *parent = 0);
