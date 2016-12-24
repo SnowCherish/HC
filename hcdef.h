@@ -16,4 +16,20 @@ typedef MYSQL_ROW ROW;
 #define HC_PASSWD "123456"
 #define HC_DB "hc"
 #define HC_REDIS_PORT 6379
+
+typedef enum BOOL{FALSE=0,TRUE=1} Bool;
+/*typedef struct _hc{
+    int id;
+    char buf[0];
+}hc;
+
+typedef struct _Passenger{
+    char username[64];
+    char password[32];
+    int age;
+    int sex;
+    char tel[11];
+    char cardId[18];
+}Passenger;
+*/
 #endif // HCDEF_H

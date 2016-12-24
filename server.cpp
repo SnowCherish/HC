@@ -5,6 +5,8 @@
 #include "hcdef.h"
 #include "sqlconn.h"
 #include "util.h"
+
+static QString str="";//save error info
 Server::Server(QObject *parent) : QObject(parent)
 {
     server = new HttpServer();
@@ -39,6 +41,12 @@ int Server::handle_Login(QByteArray& req)
 
     }
 }
+int Server::IsExist(QString name)
+{
+    QString sql;
+    sql = QString("select * from passgenger where username=%1").arg(name);
+}
+//handle reg
 int Server::handle_Reg(QByteArray& req)
 {
     Json j(req);
@@ -50,7 +58,14 @@ int Server::handle_Reg(QByteArray& req)
 
     }else if(type.compare(HC_PASSENGER)==0) //passenger
     {
+        QString username = j.parse("username").toString();
+        QString password = j.parse("password").toString();
+        int age = j.parse("age").toInt();
+        int sex = j.parse("sex").toInt();
+        QString tel = j.parse("tel").toString();
+        QString cardId = j.parse("cardId").toString();
         QString sql;
+        IsExist(username);
         sql = QString("insert into passenger values('%1','%2','%3','%4','%5','%6','%7')").arg(id).arg(username)
                 .arg(password).arg(age).arg(sex).arg(tel).arg(cardId);
         int ret = SqlConn::getInstance()->insert(sql);

@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <mysql/mysql_com.h>
 #include "hcdef.h"
+#include "json.h"
+#include <QJsonDocument>
+#include <QJsonObject>
 SqlConn::SqlConn(QObject *parent) : QObject(parent)
 {
     sql = mysql_init(NULL);
@@ -33,7 +36,7 @@ int SqlConn::insert(QString str)
     if(status!=0)
     {
         qDebug() << "mysql query error!";
-        exit(1);
+        return -1;
     }
     return 0;
 }
@@ -47,33 +50,42 @@ SqlConn::~SqlConn()
     }
 }
 
-int SqlConn::selData(QString str,MYSQL_ROW& r)
+int SqlConn::selData(QString str,QByteArray* array)
 {
     int status = mysql_query(sql,str.toUtf8().data());
     if(status!=0)
     {
         qDebug() << "mysql query error!";
-        exit(1);
+        return -1;
     }
     int count = mysql_field_count(sql);
     MYSQL_RES * result = mysql_store_result(sql);
     if(result==NULL)
     {
         qDebug() << "mysql store result error!";
-        exit(1);
+        return -1;
     }
     int i;
     MYSQL_ROW row ;
 
+    MYSQL_FIELD *field;
+    QString name;
+    int k = 0;
+    field = mysql_fetch_field(result);
     while((row= mysql_fetch_row(result)))
     {
+        Json j;
         for(i = 0;i<count;++i)
         {
-            r[i] = row[i];
+           name.append(field[i].name);
+           j.insert(name,row[i]);
+           name.clear();
         }
+      array[k++] = j.toJson();
     }
+
     mysql_free_result(result);
-    return 0;
+    return k;
 }
 
 int SqlConn::update(QString str)
@@ -82,7 +94,7 @@ int SqlConn::update(QString str)
     if(status!=0)
     {
         qDebug() << "mysql query error!";
-        exit(1);
+        return -1;
     }
     return 0;
 }

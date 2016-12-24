@@ -20,6 +20,7 @@ private:
 private:
      int handle_Login(QByteArray& req);
      int handle_Reg(QByteArray& req);
+     int IsExist(QString name);
 signals:
 
 public slots:
