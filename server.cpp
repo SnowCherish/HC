@@ -5,7 +5,7 @@
 #include "hcdef.h"
 Server::Server(QObject *parent) : QObject(parent)
 {
-    server = new HttpServeHC_PORTr();
+    server = new HttpServer();
     server->listen(QHostAddress::Any,HC_PORT);
     if(!server->isListening())
     {
@@ -25,7 +25,7 @@ Server::~Server()
     }
 }
 //handle login
-void handle_Login(QByteArray& req)
+int Server::handle_Login(QByteArray& req)
 {
     Json j(req);
     QString type = j.parse(HC_TYPE).toString();
@@ -37,23 +37,19 @@ void handle_Login(QByteArray& req)
 
     }
 }
-void Server::HandleReq(QByteArray& req,HttpServerResponse& response)
+void Server::HandleReq(QByteArray req,HttpServerResponse& response)
 {
     Json j(req);
     int ret = 0;
     QString cmd = j.parse(HC_CMD).toString();
-    switch(cmd)
+    if(cmd==HC_REG)
     {
-    //register request
-    case HC_REG:
-        break;
-     //login request
-    case HC_LOGIN:
-        ret = handle_Login(req);
-        break;
-    default:
-        break;
+
+    }else if(cmd==HC_LOGIN)
+    {
+       ret = handle_Login(req);
     }
+
 }
 
 

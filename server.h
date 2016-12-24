@@ -12,10 +12,13 @@ class Server : public QObject
 public:
     explicit Server(QObject *parent = 0);
     ~Server();
-    void HandleReq(QByteArray& req,HttpServerResponse& response);
+    void HandleReq(QByteArray req,HttpServerResponse& response);
     void HandleRes(HttpServerResponse& response);
+
 private:
     HttpServer * server;
+private:
+    int handle_Login(QByteArray& req);
 
 signals:
 

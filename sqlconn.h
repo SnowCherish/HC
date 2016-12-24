@@ -3,15 +3,18 @@
 
 #include <QObject>
 #include <mysql/mysql.h>
+
 class SqlConn : public QObject
 {
     Q_OBJECT
 public:
-    explicit SqlConn(QObject *parent = 0);
+    static SqlConn* getInstance();
     int insert(QString str);
     ~SqlConn();
-    QString getErrInfo(int err);
+    int selData(QString str,MYSQL_ROW* r);
+    int update(QString str);
 private:
+    explicit SqlConn(QObject *parent = 0);
     MYSQL* sql;
 
 signals:
