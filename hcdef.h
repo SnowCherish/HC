@@ -1,6 +1,9 @@
 #ifndef HCDEF_H
 #define HCDEF_H
+#include <mysql/mysql.h>
+#include <mysql/mysql_com.h>
 
+typedef MYSQL_ROW ROW;
 #define HC_PORT 9999
 #define HC_CMD "cmd"
 #define HC_REG "reg"

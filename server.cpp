@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "json.h"
 #include "hcdef.h"
+#include "sqlconn.h"
+#include "util.cpp"
 Server::Server(QObject *parent) : QObject(parent)
 {
     server = new HttpServer();
@@ -25,7 +27,19 @@ Server::~Server()
     }
 }
 //handle login
-int Server::handle_Login(QByteArray& req)
+ int Server::handle_Login(QByteArray& req)
+{
+    Json j(req);
+    QString type = j.parse(HC_TYPE).toString();
+    if(type.compare(HC_DRIVER)==0) //driver
+    {
+
+    }else if(type.compare(HC_PASSENGER)==0) //passenger
+    {
+
+    }
+}
+ int Server::handle_Reg(QByteArray& req)
 {
     Json j(req);
     QString type = j.parse(HC_TYPE).toString();
@@ -44,7 +58,7 @@ void Server::HandleReq(QByteArray req,HttpServerResponse& response)
     QString cmd = j.parse(HC_CMD).toString();
     if(cmd==HC_REG)
     {
-
+        ret = handle_Reg(req);
     }else if(cmd==HC_LOGIN)
     {
        ret = handle_Login(req);

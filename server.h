@@ -18,8 +18,8 @@ public:
 private:
     HttpServer * server;
 private:
-    int handle_Login(QByteArray& req);
-
+     int handle_Login(QByteArray& req);
+     int handle_Reg(QByteArray& req);
 signals:
 
 public slots:
