@@ -3,15 +3,16 @@ HEADERS += \
     json.h \
     hcdef.h \
     sqlconn.h \
-    redis.h
+    redis.h \
+    util.h
 
 SOURCES += \
     server.cpp \
     main.cpp \
     json.cpp \
-    util.cpp \
     sqlconn.cpp \
-    redis.cpp
+    redis.cpp \
+    util.cpp
 QT +=network sql
 CONFIG +=c++11
 LIBS +=-L/usr/local/lib -ltufao1 -lmysqlclient -lhiredis

@@ -4,7 +4,7 @@
 #include "json.h"
 #include "hcdef.h"
 #include "sqlconn.h"
-#include "util.cpp"
+#include "util.h"
 Server::Server(QObject *parent) : QObject(parent)
 {
     server = new HttpServer();
@@ -43,12 +43,25 @@ Server::~Server()
 {
     Json j(req);
     QString type = j.parse(HC_TYPE).toString();
+    QString id = "123123123";
     if(type.compare(HC_DRIVER)==0) //driver
     {
 
 
     }else if(type.compare(HC_PASSENGER)==0) //passenger
     {
+        QString sql;
+        //sql = QString("insert into passenger values('%1','%2','%3','%4','%5','%6','%7')").arg(id).arg(username)
+          //      .arg(password).arg(age).arg(sex).arg(tel).arg(cardId);
+        int ret = SqlConn::getInstance()->insert(sql);
+        if(ret!=0)
+        {
+            qDebug() << "insert failed!";
+            exit(1);
+        }else{
+            qDebug() << "insert ok!";
+        }
+
 
     }
 }
