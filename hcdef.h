@@ -23,6 +23,7 @@ typedef MYSQL_ROW ROW;
 #define HC_UNKNOW "unknow reason"
 #define HC_SUCCESS "success"
 #define HC_REG_FAILED "reg failed!"
+#define HC_NOTUSER "user not exist"
 
 typedef enum BOOL{FALSE=0,TRUE=1} Bool;
 /*typedef struct _hc{

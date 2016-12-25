@@ -35,15 +35,45 @@ Server::~Server()
 //handle login
 QByteArray Server::handle_Login(QByteArray& req)
 {
+    int ret;
     Json j(req);
     QString type = j.parse(HC_TYPE).toString();
+    QString username = j.parse("username").toString();
+    QString passwd = j.parse("password").toString();
+    QString password = j.encry(passwd);
     if(type==HC_DRIVER) //driver
     {
-
+        QString sql;
+        sql = QString("select * from driver where username=%1 and password=%2")
+                .arg(username).arg(password);
+        ret = IsExist(sql);
+        if(ret!=1)
+        {
+            Json resp;
+            resp.insert(HC_CMD,HC_LOGIN);
+            resp.insert(HC_RESULT,HC_FAILED);
+            resp.insert(HC_REASON,HC_NOTUSER);
+            return resp.toJson();
+        }
     }else if(type==HC_PASSENGER) //passenger
     {
-
+        QString sql;
+        sql = QString("select * from passenger where username=%1 and password=%2")
+                .arg(username).arg(password);
+        ret = IsExist(sql);
+        if(ret!=1)
+        {
+            Json resp;
+            resp.insert(HC_CMD,HC_LOGIN);
+            resp.insert(HC_RESULT,HC_FAILED);
+            resp.insert(HC_REASON,HC_NOTUSER);
+            return resp.toJson();
+        }
     }
+    Json resp;
+    resp.insert(HC_CMD,HC_LOGIN);
+    resp.insert(HC_RESULT,HC_SUCCESS);
+    return resp.toJson();
 }
 
 //handle reg
