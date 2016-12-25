@@ -16,8 +16,16 @@ public:
     static Redis* getInstance();
     int get(QString& str,QByteArray& array);
     int set(QString& str,QByteArray array);
-    int setList(QString& str,QByteArray array);
+    int setList(QString& str,QString& username);
+    int setDriverHash(QString &username, int& status,double lat,double lng,QString& geohash,QString& tel,
+                             QString& carId,QString& time);
+    int getHash(QString& username,QString& array,QString & data);
+    int setPassHash(QString &username, double& lat,double& lng,QString& geohash,QString& tel,
+                             QString& time);
     int getList(QString str,QByteArray* array);
+    int setHash(QString& username,QString& str,QString& data);
+    int setHash(QString& username,QString& str,int& data);
+    int setHash(QString& username,QString& str,double& data);
 private:
     explicit Redis(QObject *parent = 0);
     ~Redis();

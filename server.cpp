@@ -22,16 +22,15 @@ Server::Server(QObject *parent) : QObject(parent)
 void Server::saveDriverStatus(int status,QString username,double lat,double lng,QString carId,QString tel,QString time)
 {
     qint64 geohash = Util::getInstance()->geohash(lng,lat,20);
-    Json j;
-    j.insert("isBusy",status);
-    j.insert("lat",lat);
-    j.insert("lng",lng);
-    j.insert("username",username);
-    j.insert("carId",carId);
-    j.insert("tel",tel);
-    j.insert("time",time);
+
     QString key = QString::number(geohash);
-    int ret = Redis::getInstance()->setList(key,j.toJson());
+    int ret = Redis::getInstance()->setList(key,username);
+    if(ret!=0)
+    {
+        qDebug() << "save msg to redis error!";
+        exit(1);
+    }
+    ret = Redis::getInstance()->setDriverHash(username,status,lat,lng,key,tel,carId,time);
     if(ret!=0)
     {
         qDebug() << "save msg to redis error!";
@@ -42,13 +41,9 @@ void Server::saveDriverStatus(int status,QString username,double lat,double lng,
 void Server::savePassStatus(QString username,double lat,double lng,QString tel,QString time)
 {
     qint64 geohash = Util::getInstance()->geohash(lng,lat,20);
-    Json j;
-    j.insert("lat",lat);
-    j.insert("lng",lng);
-    j.insert("tel",tel);
-    j.insert("time",time);
-    j.insert("geohash",geohash);
-    int ret = Redis::getInstance()->set(username,j.toJson());
+    QString key = QString::number(geohash);
+
+    int ret = Redis::getInstance()->setPassHash(username,lat,lng,key,tel,time);
     if(ret!=0)
     {
         qDebug() << "save msg to redis error!";
