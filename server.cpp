@@ -38,6 +38,23 @@ void Server::saveDriverStatus(int status,QString username,double lat,double lng,
         exit(1);
     }
 }
+//save passenger status to redis
+void Server::savePassStatus(QString username,double lat,double lng,QString tel,QString time)
+{
+    qint64 geohash = Util::getInstance()->geohash(lng,lat,20);
+    Json j;
+    j.insert("lat",lat);
+    j.insert("lng",lng);
+    j.insert("tel",tel);
+    j.insert("time",time);
+    j.insert("geohash",geohash);
+    int ret = Redis::getInstance()->set(username,j.toJson());
+    if(ret!=0)
+    {
+        qDebug() << "save msg to redis error!";
+        exit(1);
+    }
+}
 int Server::IsExist(QString& sql)
 {
     int ret = SqlConn::getInstance()->selData(sql,NULL);
@@ -100,7 +117,7 @@ QByteArray Server::handle_Login(QByteArray& req)
         }
         Json msg(array[0]);
         QString tel = msg.parse("tel").toString();
-        //savePassStatus(username,lat,lng,tel,time);
+        savePassStatus(username,lat,lng,tel,time);
         delete array;
     }
     Json resp;

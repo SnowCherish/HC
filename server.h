@@ -21,6 +21,7 @@ private:
      QByteArray handle_Login(QByteArray& req);
      QByteArray handle_Reg(QByteArray& req);
      void saveDriverStatus(int status,QString usrname,double lat,double lng,QString carId,QString tel,QString time);
+     void savePassStatus(QString username,double lat,double lng,QString tel,QString time);
      int IsExist(QString& sql);
 signals:
 
