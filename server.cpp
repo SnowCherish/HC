@@ -78,7 +78,7 @@ QByteArray Server::handle_Login(QByteArray& req)
     if(type==HC_DRIVER) //driver
     {
         QString sql;
-        sql = QString("select * from driver where username=%1 and password=%2")
+        sql = QString("select * from driver where username='%1' and password='%2'")
                 .arg(username).arg(password);
         QByteArray * array = new QByteArray;
         ret = SqlConn::getInstance()->selData(sql,array);
@@ -98,7 +98,7 @@ QByteArray Server::handle_Login(QByteArray& req)
     }else if(type==HC_PASSENGER) //passenger
     {
         QString sql;
-        sql = QString("select * from passenger where username=%1 and password=%2")
+        sql = QString("select * from passenger where username='%1' and password='%2'")
                 .arg(username).arg(password);
         QByteArray * array = new QByteArray;
         ret = SqlConn::getInstance()->selData(sql,array);
@@ -124,22 +124,12 @@ QByteArray Server::handle_Login(QByteArray& req)
 //handle reg
 QByteArray Server::handle_Reg(QByteArray& req)
 {
-    int ret;
+
     Json j(req);
     QString type = j.parse(HC_TYPE).toString();
     QString id = Util::getInstance()->generId();
     QString username = j.parse("username").toString();
-    QString sel;
-    sel = QString("select * from passgenger where username=%1").arg(username);
-    ret = IsExist(sel);
-    if(ret>0) //username is already exists
-    {
-        Json resp;
-        resp.insert(HC_CMD,HC_REG);
-        resp.insert(HC_RESULT,HC_FAILED);
-        resp.insert(HC_REASON,HC_USEREXIST);
-        return resp.toJson();
-    }
+
     QString passwd = j.parse("password").toString();
     QString password = j.encry(passwd);
     int age = j.parse("age").toInt();
@@ -149,6 +139,21 @@ QByteArray Server::handle_Reg(QByteArray& req)
     QString sql;
     if(type==HC_DRIVER) //driver
     {
+        QString sel;
+        sel = QString("select count(*) from driver where username='%1'").arg(username);
+        QByteArray* array = new QByteArray;
+        SqlConn::getInstance()->selData(sel,array);
+        Json json(array[0]);
+        QString res = json.parse("count(*)").toString();
+        delete array;
+        if(res!="0") //username is already exists
+        {
+            Json resp;
+            resp.insert(HC_CMD,HC_REG);
+            resp.insert(HC_RESULT,HC_FAILED);
+            resp.insert(HC_REASON,HC_USEREXIST);
+            return resp.toJson();
+        }
         QString carId = j.parse("carId").toString();
         sql = QString("insert into driver values('%1','%2','%3','%4','%5','%6','%7','%8')").arg(id).arg(username)
                 .arg(password).arg(age).arg(sex).arg(tel).arg(cardId).arg(carId);
@@ -161,10 +166,23 @@ QByteArray Server::handle_Reg(QByteArray& req)
             resp.insert(HC_REASON,HC_REG_FAILED);
             return resp.toJson();
         }
-
     }else if(type==HC_PASSENGER) //passenger
     {
-
+        QString sel;
+        sel = QString("select count(*) from passenger where username='%1'").arg(username);
+        QByteArray* array = new QByteArray;
+        SqlConn::getInstance()->selData(sel,array);
+        Json j(array[0]);
+        QString res = j.parse("count(*)").toString();
+        delete array;
+        if(res!="0") //username is already exists
+        {
+            Json resp;
+            resp.insert(HC_CMD,HC_REG);
+            resp.insert(HC_RESULT,HC_FAILED);
+            resp.insert(HC_REASON,HC_USEREXIST);
+            return resp.toJson();
+        }
         sql = QString("insert into passenger values('%1','%2','%3','%4','%5','%6','%7')").arg(id).arg(username)
                 .arg(password).arg(age).arg(sex).arg(tel).arg(cardId);
         int ret = SqlConn::getInstance()->insert(sql);
@@ -194,6 +212,7 @@ void Server::HandleReq(QByteArray req,HttpServerResponse& response)
     }else if(cmd==HC_LOGIN)
     {
         array = handle_Login(req);
+
     }
     response.writeHead(HttpResponseStatus::OK);
     response.end(array);
