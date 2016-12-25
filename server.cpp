@@ -80,7 +80,11 @@ QByteArray& Server::handle_Reg(QByteArray& req)
         int ret = SqlConn::getInstance()->insert(sql);
         if(ret!=0)
         {
-
+            Json resp;
+            resp.insert(HC_CMD,HC_REG);
+            resp.insert(HC_RESULT,HC_FAILED);
+            resp.insert(HC_REASON,HC_REG_FAILED);
+            return resp.toJson();
         }
 
     }else if(type==HC_PASSENGER) //passenger
@@ -91,11 +95,19 @@ QByteArray& Server::handle_Reg(QByteArray& req)
         int ret = SqlConn::getInstance()->insert(sql);
         if(ret!=0)
         {
-
+            Json resp;
+            resp.insert(HC_CMD,HC_REG);
+            resp.insert(HC_RESULT,HC_FAILED);
+            resp.insert(HC_REASON,HC_REG_FAILED);
+            return resp.toJson();
         }
 
     }
-    return ;
+    Json resp;
+    resp.insert(HC_CMD,HC_REG);
+    resp.insert(HC_RESULT,HC_SUCCESS);
+
+    return resp.toJson();
 }
 void Server::HandleReq(QByteArray req,HttpServerResponse& response)
 {
