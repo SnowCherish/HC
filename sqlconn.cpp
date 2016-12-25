@@ -66,22 +66,31 @@ int SqlConn::selData(QString str,QByteArray* array)
         return -1;
     }
     int i;
-    MYSQL_ROW row ;
+
 
     MYSQL_FIELD *field;
     QString name;
     int k = 0;
     field = mysql_fetch_field(result);
+
+    MYSQL_ROW row ;
     while((row= mysql_fetch_row(result)))
     {
         Json j;
         for(i = 0;i<count;++i)
         {
-           name.append(field[i].name);
-           j.insert(name,row[i]);
-           name.clear();
+            name.append(field[i].name);
+            j.insert(name,row[i]);
+            name.clear();
         }
-      array[k++] = j.toJson();
+        if(array==NULL)
+        {
+            k++;
+        }
+        else
+        {
+            array[k++] = j.toJson();
+        }
     }
 
     mysql_free_result(result);
