@@ -5,8 +5,7 @@
 #include "hcdef.h"
 #include "sqlconn.h"
 #include "util.h"
-
-static QString str="";//save error info
+#include "redis.h"
 Server::Server(QObject *parent) : QObject(parent)
 {
     server = new HttpServer();
@@ -18,6 +17,25 @@ Server::Server(QObject *parent) : QObject(parent)
     }
     qDebug() << "Server is listening!";
     connect(server,&HttpServer::requestReady,this,&Server::slotReadyReqRes);
+}
+//save driver status to redis
+void Server::saveDriverStatus(int status,QString username,double lat,double lng,QString carId,QString tel,QString time)
+{
+    qint64 geohash = Util::getInstance()->geohash(lng,lat,20);
+    Json j;
+    j.insert("isBusy",status);
+    j.insert("lat",lat);
+    j.insert("lng",lng);
+    j.insert("geohash",geohash);
+    j.insert("carId",carId);
+    j.insert("tel",tel);
+    j.insert("time",time);
+    int ret = Redis::getInstance()->set(username,j.toJson());
+    if(ret!=0)
+    {
+        qDebug() << "save msg to redis error!";
+        exit(1);
+    }
 }
 int Server::IsExist(QString& sql)
 {
@@ -41,12 +59,16 @@ QByteArray Server::handle_Login(QByteArray& req)
     QString username = j.parse("username").toString();
     QString passwd = j.parse("password").toString();
     QString password = j.encry(passwd);
+    double lat = j.parse("lat").toDouble();
+    double lng = j.parse("lng").toDouble();
+    QString time = Util::getInstance()->getCurrentTime();
     if(type==HC_DRIVER) //driver
     {
         QString sql;
         sql = QString("select * from driver where username=%1 and password=%2")
                 .arg(username).arg(password);
-        ret = IsExist(sql);
+        QByteArray * array = new QByteArray;
+        ret = SqlConn::getInstance()->selData(sql,array);
         if(ret!=1)
         {
             Json resp;
@@ -55,12 +77,18 @@ QByteArray Server::handle_Login(QByteArray& req)
             resp.insert(HC_REASON,HC_NOTUSER);
             return resp.toJson();
         }
+        Json msg(array[0]);
+        QString carId = msg.parse("carid").toString();
+        QString tel = msg.parse("tel").toString();
+        saveDriverStatus(1,username,lat,lng,carId,tel,time);
+        delete array;
     }else if(type==HC_PASSENGER) //passenger
     {
         QString sql;
         sql = QString("select * from passenger where username=%1 and password=%2")
                 .arg(username).arg(password);
-        ret = IsExist(sql);
+        QByteArray * array = new QByteArray;
+        ret = SqlConn::getInstance()->selData(sql,array);
         if(ret!=1)
         {
             Json resp;
@@ -69,6 +97,10 @@ QByteArray Server::handle_Login(QByteArray& req)
             resp.insert(HC_REASON,HC_NOTUSER);
             return resp.toJson();
         }
+        Json msg(array[0]);
+        QString tel = msg.parse("tel").toString();
+        savePassStatus(username,lat,lng,tel,time);
+        delete array;
     }
     Json resp;
     resp.insert(HC_CMD,HC_LOGIN);

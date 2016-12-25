@@ -24,7 +24,7 @@ Redis *Redis::getInstance()
     return redis;
 }
 
-int Redis::set(QString &str, QByteArray &array)
+int Redis::set(QString &str, QByteArray array)
 {
     if(str.isEmpty() || array.isEmpty())
     {
