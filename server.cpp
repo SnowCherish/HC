@@ -19,7 +19,11 @@ Server::Server(QObject *parent) : QObject(parent)
     qDebug() << "Server is listening!";
     connect(server,&HttpServer::requestReady,this,&Server::slotReadyReqRes);
 }
-
+int Server::IsExist(QString& sql)
+{
+    int ret = SqlConn::getInstance()->selData(sql,NULL);
+    return ret;
+}
 Server::~Server()
 {
     if(server!=NULL)
@@ -29,7 +33,7 @@ Server::~Server()
     }
 }
 //handle login
-int Server::handle_Login(QByteArray& req)
+QByteArray Server::handle_Login(QByteArray& req)
 {
     Json j(req);
     QString type = j.parse(HC_TYPE).toString();
@@ -41,13 +45,9 @@ int Server::handle_Login(QByteArray& req)
 
     }
 }
-int Server::IsExist(QString& sql)
-{   
-    int ret = SqlConn::getInstance()->selData(sql,NULL);
-    return ret;
-}
+
 //handle reg
-QByteArray& Server::handle_Reg(QByteArray& req)
+QByteArray Server::handle_Reg(QByteArray& req)
 {
     int ret;
     Json j(req);
@@ -55,8 +55,8 @@ QByteArray& Server::handle_Reg(QByteArray& req)
     QString id = Util::getInstance()->generId();
     QString username = j.parse("username").toString();
     QString sel;
-    sel = QString("select * from passgenger where username=%1").arg(name);
-    ret = IsExist(sql);
+    sel = QString("select * from passgenger where username=%1").arg(username);
+    ret = IsExist(sel);
     if(ret>0) //username is already exists
     {
         Json resp;
@@ -106,7 +106,6 @@ QByteArray& Server::handle_Reg(QByteArray& req)
     Json resp;
     resp.insert(HC_CMD,HC_REG);
     resp.insert(HC_RESULT,HC_SUCCESS);
-
     return resp.toJson();
 }
 void Server::HandleReq(QByteArray req,HttpServerResponse& response)

@@ -18,9 +18,9 @@ public:
 private:
     HttpServer * server;
 private:
-     int handle_Login(QByteArray& req);
-     int handle_Reg(QByteArray& req);
-     int IsExist(QString name);
+     QByteArray handle_Login(QByteArray& req);
+     QByteArray handle_Reg(QByteArray& req);
+     int IsExist(QString& sql);
 signals:
 
 public slots:
