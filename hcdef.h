@@ -16,6 +16,13 @@ typedef MYSQL_ROW ROW;
 #define HC_PASSWD "123456"
 #define HC_DB "hc"
 #define HC_REDIS_PORT 6379
+#define HC_RESULT "result"
+#define HC_FAILED "failed"
+#define HC_REASON "reason"
+#define HC_USEREXIST "username is already exists"
+#define HC_UNKNOW "unknow reason"
+#define HC_SUCCESS "success"
+#define HC_REG_FAILED "reg failed!"
 
 typedef enum BOOL{FALSE=0,TRUE=1} Bool;
 /*typedef struct _hc{

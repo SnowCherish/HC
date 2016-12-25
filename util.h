@@ -9,7 +9,7 @@ class Util : public QObject
 public:
     static Util* getInstance();
     QString getCurrentTime();
-    qint64 geohash(double Lat,double Lng,int bits);
+    qint64 geohash(double lng, double lat,int bit);
     QString generId();
 private:
      explicit Util(QObject *parent = 0);
