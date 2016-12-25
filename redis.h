@@ -16,6 +16,8 @@ public:
     static Redis* getInstance();
     int get(QString& str,QByteArray& array);
     int set(QString& str,QByteArray array);
+    int setList(QString& str,QByteArray array);
+    int getList(QString str,QByteArray* array);
 private:
     explicit Redis(QObject *parent = 0);
     ~Redis();

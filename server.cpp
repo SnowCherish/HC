@@ -26,11 +26,12 @@ void Server::saveDriverStatus(int status,QString username,double lat,double lng,
     j.insert("isBusy",status);
     j.insert("lat",lat);
     j.insert("lng",lng);
-    j.insert("geohash",geohash);
+    j.insert("username",username);
     j.insert("carId",carId);
     j.insert("tel",tel);
     j.insert("time",time);
-    int ret = Redis::getInstance()->set(username,j.toJson());
+    QString key = QString::number(geohash);
+    int ret = Redis::getInstance()->setList(key,j.toJson());
     if(ret!=0)
     {
         qDebug() << "save msg to redis error!";
@@ -99,7 +100,7 @@ QByteArray Server::handle_Login(QByteArray& req)
         }
         Json msg(array[0]);
         QString tel = msg.parse("tel").toString();
-        savePassStatus(username,lat,lng,tel,time);
+        //savePassStatus(username,lat,lng,tel,time);
         delete array;
     }
     Json resp;
