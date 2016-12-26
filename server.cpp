@@ -212,7 +212,7 @@ void Server::HandleReq(QByteArray req,HttpServerResponse& response)
     }else if(cmd==HC_LOGIN)
     {
         array = handle_Login(req);
-
+        qDebug() << array;
     }
     response.writeHead(HttpResponseStatus::OK);
     response.end(array);

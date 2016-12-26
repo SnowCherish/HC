@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <string.h>
 #include "json.h"
-
+Redis* Redis::redis = NULL;
 Redis::Redis(QObject *parent) : QObject(parent)
 {
     c = redisConnect(HC_ADDRESS,HC_REDIS_PORT);
@@ -17,7 +17,7 @@ Redis::Redis(QObject *parent) : QObject(parent)
 }
 Redis *Redis::getInstance()
 {
-    static Redis* redis = NULL;
+
     if(redis==NULL)
     {
         redis = new Redis;
@@ -27,7 +27,7 @@ Redis *Redis::getInstance()
 
 int Redis::set(QString &str, QByteArray array)
 {
-    if(str.isEmpty() || array.isEmpty())
+    if(str.isEmpty())
     {
         qDebug() << "str is NULL";
         return -1;
@@ -61,7 +61,7 @@ int Redis::setDriverHash(QString &username, int& status,double lat,double lng,QS
         qDebug() << "str is NULL";
         return -1;
     }
-    char buf[4096] = {0};
+    char buf[1024] = {0};
     sprintf(buf,"hmset %s status %d lat %f lng %f geohash %s tel %s carId %s time %s",
             username.toUtf8().data(),status,lat,lng,geohash.toUtf8().data(),tel.toUtf8().data(),
             carId.toUtf8().data(),time.toUtf8().data());
@@ -84,7 +84,7 @@ int Redis::setDriverHash(QString &username, int& status,double lat,double lng,QS
 }
 //passenger -->hash
 int Redis::setPassHash(QString &username, double& lat,double& lng,QString& geohash,QString& tel,
-                         QString& time)
+                       QString& time)
 {
     if(username.isEmpty())
     {
@@ -94,7 +94,7 @@ int Redis::setPassHash(QString &username, double& lat,double& lng,QString& geoha
     char buf[4096] = {0};
     sprintf(buf,"hmset %s lat %f lng %f geohash %s tel %s time %s",
             username.toUtf8().data(),lat,lng,geohash.toUtf8().data(),tel.toUtf8().data(),
-           time.toUtf8().data());
+            time.toUtf8().data());
     r = (redisReply*)redisCommand(c,buf);
     if(r==NULL)
     {
@@ -110,6 +110,36 @@ int Redis::setPassHash(QString &username, double& lat,double& lng,QString& geoha
         return -1;
     }
     freeReplyObject(r);
+    return 0;
+}
+
+int Redis::getList(QString& str, QVector<QString> &list)
+{
+    if(str.isEmpty() || list.isEmpty())
+    {
+        qDebug() << "str or list is empty !";
+        return -1;
+    }
+    char buf[1024] = {0};
+    sprintf(buf,"lrange %s 0 -1",str.toUtf8().data());
+    r = (redisReply*)redisCommand(c,buf);
+    if(r==NULL)
+    {
+        qDebug() << "r is null";
+        return -1;
+    }
+    if(!(r->type==REDIS_REPLY_ARRAY))
+    {
+        qDebug() << "redis select error!";
+        return -1;
+    }
+    size_t i;
+    redisReply* reply;
+    for ( i = 0; i < r->elements; ++i) {
+        reply = (redisReply*)r->element[i];
+        list.push_back(QString(reply->str));
+    }
+
     return 0;
 }
 
@@ -223,18 +253,16 @@ int Redis::getHash(QString &username, QString &array,QString & data)
     return 0;
 }
 
-int Redis::setList(QString& str, QString& username)
+int Redis::setList(QString& str,QString& username)
 {
+
     if(str.isEmpty())
     {
         qDebug() << "str is NULL";
         return -1;
     }
     char buf[1024] = {0};
-
-
-    sprintf(buf,"lpush %s %s",str.toUtf8().data(),username.toUtf8().data());
-    //qDebug() << buf;
+    sprintf(buf,"LPUSH %s %s",str.toUtf8().data(),username.toUtf8().data());
     r = (redisReply*)redisCommand(c,buf);
     if(r==NULL)
     {
@@ -249,7 +277,9 @@ int Redis::setList(QString& str, QString& username)
         redisFree(c);
         return -1;
     }
+
     freeReplyObject(r);
+
     return 0;
 }
 
@@ -289,5 +319,9 @@ Redis::~Redis()
     {
         redisFree(c);
         c = NULL;
+    }
+    if (redis!=NULL) {
+        free(redis);
+        redis = NULL;
     }
 }

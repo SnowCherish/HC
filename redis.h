@@ -9,10 +9,12 @@
 #include <hiredis/hiredis.h>
 #include <QByteArray>
 #include <QString>
+#include <QVector>
 class Redis : public QObject
 {
     Q_OBJECT
 public:
+    static Redis* redis;
     static Redis* getInstance();
     int get(QString& str,QByteArray& array);
     int set(QString& str,QByteArray array);
@@ -22,7 +24,7 @@ public:
     int getHash(QString& username,QString& array,QString & data);
     int setPassHash(QString &username, double& lat,double& lng,QString& geohash,QString& tel,
                              QString& time);
-    int getList(QString str,QByteArray* array);
+    int getList(QString& str,QVector<QString>& list);
     int setHash(QString& username,QString& str,QString& data);
     int setHash(QString& username,QString& str,int& data);
     int setHash(QString& username,QString& str,double& data);
