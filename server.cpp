@@ -77,6 +77,7 @@ QByteArray Server::handle_Login(QByteArray& req)
     QString time = Util::getInstance()->getCurrentTime();
     if(type==HC_DRIVER) //driver
     {
+        username+="D";
         QString sql;
         sql = QString("select * from driver where username='%1' and password='%2'")
                 .arg(username).arg(password);
@@ -97,6 +98,7 @@ QByteArray Server::handle_Login(QByteArray& req)
         delete array;
     }else if(type==HC_PASSENGER) //passenger
     {
+        username+="P";
         QString sql;
         sql = QString("select * from passenger where username='%1' and password='%2'")
                 .arg(username).arg(password);
@@ -139,6 +141,7 @@ QByteArray Server::handle_Reg(QByteArray& req)
     QString sql;
     if(type==HC_DRIVER) //driver
     {
+        username+="D";
         QString sel;
         sel = QString("select count(*) from driver where username='%1'").arg(username);
         QByteArray* array = new QByteArray;
@@ -168,6 +171,7 @@ QByteArray Server::handle_Reg(QByteArray& req)
         }
     }else if(type==HC_PASSENGER) //passenger
     {
+        username+="P";
         QString sel;
         sel = QString("select count(*) from passenger where username='%1'").arg(username);
         QByteArray* array = new QByteArray;
@@ -212,7 +216,7 @@ void Server::HandleReq(QByteArray req,HttpServerResponse& response)
     }else if(cmd==HC_LOGIN)
     {
         array = handle_Login(req);
-        qDebug() << array;
+        //qDebug() << array;
     }
     response.writeHead(HttpResponseStatus::OK);
     response.end(array);

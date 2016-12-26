@@ -28,6 +28,8 @@ public:
     int setHash(QString& username,QString& str,QString& data);
     int setHash(QString& username,QString& str,int& data);
     int setHash(QString& username,QString& str,double& data);
+    int del(QString& key);
+    int removeFromList(QString& key,QString& username);
 private:
     explicit Redis(QObject *parent = 0);
     ~Redis();

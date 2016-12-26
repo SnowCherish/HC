@@ -257,7 +257,7 @@ int Redis::removeFromList(QString &key, QString &username)
     }
     char buf[1024] = {0};
     sprintf(buf,"lrem %s %s",key.toUtf8().data(),username.toUtf8().data());
-    r = redisCommand(c,buf);
+    r = (redisReply*)redisCommand(c,buf);
     if(r==NULL)
     {
         qDebug() << "r is null!";
@@ -271,6 +271,7 @@ int Redis::removeFromList(QString &key, QString &username)
     freeReplyObject(r);
     return 0;
 }
+
 
 //key--->value
 int Redis::getHash(QString &username, QString &array,QString & data)
