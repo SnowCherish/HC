@@ -143,7 +143,7 @@ int Redis::getList(QString& str, QVector<QString> &list)
     return 0;
 }
 
-int Redis::setHash(QString &username, QString &str, QString &data)
+int Redis::setHash(QString &username, QString str, QString &data)
 {
     if(username.isEmpty())
     {
@@ -170,7 +170,7 @@ int Redis::setHash(QString &username, QString &str, QString &data)
     return 0;
 }
 
-int Redis::setHash(QString &username, QString &str, int &data)
+int Redis::setHash(QString &username, QString str, int &data)
 {
     if(username.isEmpty())
     {
@@ -197,7 +197,7 @@ int Redis::setHash(QString &username, QString &str, int &data)
     return 0;
 }
 
-int Redis::setHash(QString &username, QString &str, double &data)
+int Redis::setHash(QString &username, QString str, double &data)
 {
     if(username.isEmpty())
     {

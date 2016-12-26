@@ -23,6 +23,8 @@ private:
      void saveDriverStatus(int status,QString usrname,double lat,double lng,QString carId,QString tel,QString time);
      void savePassStatus(QString username,double lat,double lng,QString tel,QString time);
      int IsExist(QString& sql);
+     QByteArray handle_updatepos(QByteArray& req);
+     QByteArray handle_update_status(QByteArray& req);
 signals:
 
 public slots:

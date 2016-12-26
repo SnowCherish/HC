@@ -25,9 +25,9 @@ public:
     int setPassHash(QString &username, double& lat,double& lng,QString& geohash,QString& tel,
                              QString& time);
     int getList(QString& str,QVector<QString>& list);
-    int setHash(QString& username,QString& str,QString& data);
-    int setHash(QString& username,QString& str,int& data);
-    int setHash(QString& username,QString& str,double& data);
+    int setHash(QString& username,QString str,QString& data);
+    int setHash(QString& username,QString str,int& data);
+    int setHash(QString& username,QString str,double& data);
     int del(QString& key);
     int removeFromList(QString& key,QString& username);
 private:

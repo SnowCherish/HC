@@ -63,6 +63,78 @@ Server::~Server()
         server = NULL;
     }
 }
+//handle update driver's status
+QByteArray handle_update_status(QByteArray& req)
+{
+    int ret;
+    Json j(req);
+    QString username = j.parse("username").toString();
+    int status = j.parse("status").toInt();
+    username+="D";
+    ret = Redis::getInstance()->setHash(username,"status",status);
+    if(ret!=0)
+    {
+        Json resp;
+        resp.insert(HC_CMD,HC_UPDATESTATUS);
+        resp.insert(HC_RESULT,HC_FAILED);
+        resp.insert(HC_REASON,HC_TIMEOUT);
+        return resp.toJson();
+    }
+    Json resp;
+    resp.insert(HC_CMD,HC_UPDATESTATUS);
+    resp.insert(HC_RESULT,HC_SUCCESS);
+    return resp.toJson();
+}
+//handle update pos
+QByteArray Server::handle_updatepos(QByteArray& req)
+{
+    int ret;
+    Json j(req);
+    QString type = j.parse("type").toString();
+    QString username = j.parse("username").toString();
+    double lat = j.parse("lat").toDouble();
+    double lng = j.parse("lng").toDouble();
+    qint64 geohash = Util::getInstance()->geohash(lng,lat,20);
+    QString hash = QString::number(geohash);
+    if(type==HC_DRIVER)
+    {
+        username+="D";
+    }else if(type==HC_PASSENGER)
+    {
+        username+="P";
+    }
+    ret = Redis::getInstance()->setHash(username,"lat",lat);
+    if(ret!=0)
+    {
+        Json resp;
+        resp.insert(HC_CMD,HC_UPDATEPOS);
+        resp.insert(HC_RESULT,HC_FAILED);
+        resp.insert(HC_REASON,HC_TIMEOUT);
+        return resp.toJson();
+    }
+    ret = Redis::getInstance()->setHash(username,"lng",lng);
+    if(ret!=0)
+    {
+        Json resp;
+        resp.insert(HC_CMD,HC_UPDATEPOS);
+        resp.insert(HC_RESULT,HC_FAILED);
+        resp.insert(HC_REASON,HC_TIMEOUT);
+        return resp.toJson();
+    }
+    ret = Redis::getInstance()->setHash(username,"geohash",hash);
+    if(ret!=0)
+    {
+        Json resp;
+        resp.insert(HC_CMD,HC_UPDATEPOS);
+        resp.insert(HC_RESULT,HC_FAILED);
+        resp.insert(HC_REASON,HC_TIMEOUT);
+        return resp.toJson();
+    }
+    Json resp;
+    resp.insert(HC_CMD,HC_UPDATEPOS);
+    resp.insert(HC_RESULT,HC_SUCCESS);
+    return resp.toJson();
+}
 //handle login
 QByteArray Server::handle_Login(QByteArray& req)
 {
@@ -205,18 +277,25 @@ QByteArray Server::handle_Reg(QByteArray& req)
     resp.insert(HC_RESULT,HC_SUCCESS);
     return resp.toJson();
 }
+//handle request
 void Server::HandleReq(QByteArray req,HttpServerResponse& response)
 {
     Json j(req);
     QByteArray array;
     QString cmd = j.parse(HC_CMD).toString();
-    if(cmd==HC_REG)
+    if(cmd==HC_UPDATEPOS)
+    {
+        array = handle_updatepos(req);
+    }
+    else if(cmd==HC_REG)
     {
         array = handle_Reg(req);
     }else if(cmd==HC_LOGIN)
     {
         array = handle_Login(req);
-        //qDebug() << array;
+    }else if(cmd==HC_UPDATESTATUS)
+    {
+        array = handle_update_status(req);
     }
     response.writeHead(HttpResponseStatus::OK);
     response.end(array);
