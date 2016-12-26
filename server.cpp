@@ -75,8 +75,10 @@ QByteArray Server::handle_update_status(QByteArray& req)
     QString array("time");
     QString data;
     Redis::getInstance()->getHash(username,array,data);
+
     qint64 time = QDateTime::currentMSecsSinceEpoch();
-    if(data.toLongLong()+1800>time)
+
+    if(data.toLongLong()+1800000<time)
     {
        SEND_FAILEDMSG(HC_UPDATESTATUS,HC_TIMEOUT);
     }
@@ -118,7 +120,7 @@ QByteArray Server::handle_updatepos(QByteArray& req)
     QString data;
     Redis::getInstance()->getHash(username,array,data);
     qint64 time = QDateTime::currentMSecsSinceEpoch();
-    if(data.toLongLong()+1800>time)
+    if(data.toLongLong()+1800000<time)
     {
        SEND_FAILEDMSG(HC_UPDATESTATUS,HC_TIMEOUT);
     }
