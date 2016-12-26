@@ -25,6 +25,14 @@
 #define HC_UPDATEPOS "updatepos"
 #define HC_UPDATESTATUS "updatestatus"
 
+#define SEND_FAILEDMSG(__CMD,__RESON) do{\
+    Json resp;\
+    resp.insert(HC_CMD,__CMD);\
+    resp.insert(HC_RESULT,HC_FAILED);\
+    resp.insert(HC_REASON,__RESON);\
+    return resp.toJson();\
+}while(0)
+
 typedef enum BOOL{FALSE=0,TRUE=1} Bool;
 
 #endif // HCDEF_H
