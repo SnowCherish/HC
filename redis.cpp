@@ -139,7 +139,7 @@ int Redis::getList(QString& str, QVector<QString> &list)
         reply = (redisReply*)r->element[i];
         list.push_back(QString(reply->str));
     }
-
+    freeReplyObject(r);
     return 0;
 }
 
@@ -218,6 +218,54 @@ int Redis::setHash(QString &username, QString &str, double &data)
         qDebug() << "execute command failed!";
         freeReplyObject(r);
         redisFree(c);
+        return -1;
+    }
+    freeReplyObject(r);
+    return 0;
+}
+
+int Redis::del(QString &key)
+{
+    if(key.isEmpty())
+    {
+        qDebug() << "kei is empty!";
+        return -1;
+    }
+    char buf[1024] = {0};
+    sprintf(buf,"del %s",key.toUtf8().data());
+    r = (redisReply*)redisCommand(c,buf);
+    if(r==NULL)
+    {
+        qDebug() << "r is null!";
+        return -1;
+    }
+    if(!(r->type==REDIS_REPLY_INTEGER))
+    {
+        qDebug() << "command failed!";
+        return -1;
+    }
+    freeReplyObject(r);
+    return 0;
+}
+
+int Redis::removeFromList(QString &key, QString &username)
+{
+    if(key.isEmpty() || username.isEmpty())
+    {
+        qDebug() << "key or username is empty!";
+        return -1;
+    }
+    char buf[1024] = {0};
+    sprintf(buf,"lrem %s %s",key.toUtf8().data(),username.toUtf8().data());
+    r = redisCommand(c,buf);
+    if(r==NULL)
+    {
+        qDebug() << "r is null!";
+        return -1;
+    }
+    if(!(r->type==REDIS_REPLY_INTEGER))
+    {
+        qDebug() << "command failed!";
         return -1;
     }
     freeReplyObject(r);
