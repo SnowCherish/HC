@@ -2,13 +2,11 @@
 #include <QDebug>
 Json::Json(QObject *parent) : QObject(parent)
 {
-    obj = new QJsonObject;
 }
 
 Json::Json(QByteArray array, QObject *parent): QObject(parent)
 {
-    obj = new QJsonObject;
-    *obj = QJsonDocument::fromJson(array).object();
+    obj = QJsonDocument::fromJson(array).object();
 }
 
 QString Json::encry(QString key)
@@ -24,7 +22,7 @@ int Json::insert(QString key, QString value)
         qDebug() << "key or value is empty!";
         return -1;
     }
-    obj->insert(key,value);
+    obj.insert(key,value);
     return 0;
 }
 
@@ -35,7 +33,7 @@ int Json::insert(QString key, int value)
         qDebug() << "key  is empty!";
         return -1;
     }
-    obj->insert(key,value);
+    obj.insert(key,value);
     return 0;
 }
 
@@ -46,7 +44,7 @@ int Json::insert(QString key, double value)
         qDebug() << "key  is empty!";
         return -1;
     }
-    obj->insert(key,value);
+    obj.insert(key,value);
     return 0;
 }
 
@@ -57,25 +55,21 @@ int Json::insert(QString key, qint64 value)
         qDebug() << "key  is empty!";
         return -1;
     }
-    obj->insert(key,value);
+    obj.insert(key,value);
     return 0;
 }
 
 QJsonValue Json::parse(QString key)
 {
-    return obj->value(key);
+    return obj.value(key);
 }
 
 QByteArray Json::toJson()
 {
-    QJsonDocument doc(*obj);
+    QJsonDocument doc(obj);
     return doc.toJson();
 }
 
 Json::~Json()
 {
-    if(obj!=NULL){
-        delete obj;
-        obj = NULL;
-    }
 }
